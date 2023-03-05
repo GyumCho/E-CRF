@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>eCRF system</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+     <!-- FontAwesome glyphicon css library -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+    	.btn {
+    		border-radius:40px;
+    	}
+    
+    	.tab-pane {
+    		padding-top: 30px;
+    		padding-bottom: 30px;
+    	}
+    	
+    	.d-flex {
+    		padding-bottom: 40px;
+    	}
+    	
+    	.nav-link {
+    		color: black;
+    	}
+    	
+    	.switch {
+  			position: relative;
+  			width: 35px;
+  			height: 18px;
+	  	}
+
+	  	.switch input { 
+  			opacity: 0;
+  			width: 0;
+  			height: 0;
+      	}
+
+	  	.slider {
+  			position: absolute;
+  			cursor: pointer;
+  			top: 0;
+  			left: 0;
+  			right: 0;
+  			bottom: 0;
+  			background-color: #ccc;
+  			-webkit-transition: .4s;
+  			transition: .4s;
+	  	}
+
+	  	.slider:before {
+  	  		position: absolute;
+  	  		content: "";
+  	  		height: 10px;
+  	  		width: 10px;
+  	  		left: 4px;
+  	  		bottom: 4px;
+  	  		background-color: white;
+  	  		-webkit-transition: .4s;
+  	  		transition: .4s;
+	  	}
+
+	  	input:checked + .slider {
+  	  		background-color: #2196F3;
+	  	}
+
+	  	input:focus + .slider {
+  	  		box-shadow: 0 0 1px #2196F3;
+	  	}
+
+	  	input:checked + .slider:before {
+  	  		-webkit-transform: translateX(17px);
+      		-ms-transform: translateX(17px);
+  	  		transform: translateX(17px);
+	  	}
+
+	  	/* Rounded sliders */
+	  	.slider.round {
+  	  		border-radius: 14px;
+	  	}
+
+	  	.slider.round:before {
+  	 		border-radius: 50%;
+	  	}
+    </style>
+    <!-- <script>
+    	window.onload = function() {
+    		
+    	}
+    </script> -->
+</head>
+<body>
+	<div class="jumbotron text-center">
+    	<h1>Online eCRF creation system</h1>
+    	<p>Create your eCRF model, based on the latest WHO standard.</p>
+    </div>
+    
+	<div class="container p-4">
+  		<ul class="nav nav-tabs justify-content-end" id="tab-next-prev" role="tablist">
+    		<li class="nav-item">
+      			<a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">Module 1</a>
+    		</li>
+    		<li class="nav-item">
+      			<a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Module 2</a>
+    		</li>
+    		<li class="nav-item">
+      			<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false">Module 3</a>
+    		</li>
+  		</ul>
+  
+  		<div class="tab-content" id="tab-next-prev-content">
+    		<div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+      			<!-- <p>Content tab 1.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-next">Next</a>
+    		</div>
+    		<div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+      			<!-- <p>Content tab 2.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-prev">Previous</a>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-next">Next</a>
+    		</div>
+    		<div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+      			<!-- <p>Content tab 3.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-prev">Previous</a>
+    		</div>
+  		</div>
+	</div>
+	<div style="padding-left:10px;" class="container d-flex justify-content-end">
+	<button type="button" class="btn btn-outline-secondary" id="get save" onclick="getModules()">
+  		<span class="fa fa-download"></span> Get WHO standard
+  	</button>
+  	<button type="button" class="btn btn-outline-secondary" id="log out" onclick="location.href='index.html'">
+  		<span class="fa fa-sign-out"></span> Log out
+  	</button>
+  	</div>
+
+<script>
+	var mods;
+	var sects = [];
+	var flds = [];
+	
+    function getModules() {
+    	var button = document.getElementById('get save');
+    	button.innerHTML = "Save model";
+    	button.setAttribute("onclick", "saveModel()");
+    	var navlinks = document.getElementsByClassName('nav-link'); 
+    	var navtabs = document.getElementsByClassName('tab-pane');
+    	
+    	var xmlhttp = new XMLHttpRequest();
+    	xmlhttp.onreadystatechange = function () {
+    		if(this.readyState == 4  && this.status == 200) {
+    			var response = this.responseText;
+    			mods = JSON.parse(response);
+
+    	    	for (var i = 0; i < mods.length; i++) {
+    	            var module = mods[i];
+    	    		navtabs[i].setAttribute("id", "tab" + module.moduleid);
+    	    		navlinks[i].setAttribute("href", "#tab" + module.moduleid);
+    	    		navlinks[i].setAttribute("aria-controls", "tab" + module.moduleid);
+    	    		var div = navtabs[i].getElementsByTagName("div")[0];
+    	    		var p1 = document.createElement('h4');
+    	    		p1.setAttribute("class", "justify-content-end");
+    	    		p1.innerHTML = module.name;
+    	    		div.appendChild(p1);
+    	    		div.appendChild(document.createElement('br'));
+    	    		
+    	    	    var xmlhttp1 = new XMLHttpRequest();
+    	    	    xmlhttp1.onreadystatechange = function () {
+    	    	    	if(this.readyState == 4  && this.status == 200) {
+    	    	    		var response1 = this.responseText;
+    	    	    		var sections = JSON.parse(response1);
+    	    	    		sects.push(sections);
+    	    	    		for (var j = 0; j < sections.length; j++) {
+    	    	    			var section = sections[j];
+    	    	    			
+    	    	    			var secbut = document.createElement('button');
+    	    	    			secbut.setAttribute("class", "btn btn-outline-secondary btn-lg btn-block text-left");
+    	    	    			secbut.setAttribute("type", "button");
+    	    	    			secbut.setAttribute("data-toggle", "collapse");
+    	    	    			secbut.setAttribute("data-target", "#collapse" + section.sectionid);
+    	    	    			secbut.setAttribute("aria-expanded", "false");
+    	    	    			secbut.setAttribute("aria-controls", "collapse" + section.sectionid);
+    	    	    			secbut.innerHTML = "<b>Section: " + section.name + "</b>"; 
+    	    	    			div.appendChild(secbut);
+    	    	    			
+    	    	    			var xmlhttp2 = new XMLHttpRequest();
+    	    	    	    	xmlhttp2.onreadystatechange = function () {
+    	    	    	    		if(this.readyState == 4  && this.status == 200) {
+    	    	    	    			var response2 = this.responseText;
+    	    	    	    			var fields = JSON.parse(response2);
+    	    	    	    			flds.push(fields);
+    	    	    	    			for(var k = 0; k < fields.length; k++) {
+    	    	    	    				var field = fields[k];
+    	    	    	    				
+    	    	    	    				var coldiv = document.createElement('div');
+    	    	    	    				coldiv.setAttribute("class", "collapse");
+    	    	    	    				coldiv.setAttribute("id", "collapse" + section.sectionid);
+    	    	    	    				var fdiv = document.createElement('div');
+    	    	    	    				fdiv.setAttribute("class", "card card-body");
+    	    	    	    				fdiv.setAttribute("id", "field" + field.fieldid);
+    	    	    	    				
+											var label = document.createElement('label');
+    	    	    	    				label.setAttribute("class", "switch");
+    	    	    	    				label.setAttribute("style", "float: right;");
+    	    	    	    				var input = document.createElement('input');
+    	    	    	    				input.setAttribute("type", "checkbox");
+    	    	    	    				input.setAttribute("id", "checkbox"+field.fieldid);
+    	    	    	    				var span = document.createElement('span');
+    	    	    	    				span.setAttribute("class", "slider round");
+    	    	    	    				label.appendChild(input);
+    	    	    	    				label.appendChild(span);
+											
+    	    	    	    				var p = document.createElement('p');
+											var p1 = document.createElement('p');
+    	    	    	    				p1.innerHTML = "<b>Field Name:</b> " + field.name + ", <b>Type of field: </b> ";
+    	    	    	    				p1.appendChild(label);
+    	    	    	    				
+											var p2 = document.createElement('p');
+    	    	    	    				p2.innerHTML = "<b>WHO standard version:</b> " + field.version + " - " + field.date_of_release;
+    	    	    	    				p.appendChild(p1);
+    	    	    	    				p.appendChild(p2);
+    	    	    	    				fdiv.appendChild(p);
+											
+    	    	    	    				var sp;
+    	    	    	    				if(Object.keys(field).includes("num_of_possible_values")) {
+    	    	    	    					p1.insertAdjacentHTML('beforeend','checkbox field');
+    	    	    	    					sp = '<p><b>Possible values: </b>' + field.possible_values;
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				else if(Object.keys(field).includes("field_length") && Object.keys(field).includes("measurement_unit")) {
+    	    	    	    					p1.insertAdjacentHTML('beforeend','controlled vocabulary field');
+    	    	    	    					sp = '<p><b>Measurement unit: </b>' + field.measurement_unit + 
+    	    	    	    							', <b>Number of accepted characters: </b>' + field.field_length;
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				else if(Object.keys(field).includes("measurement_unit")) {
+    	    	    	    					p1.insertAdjacentHTML('beforeend','free text field');
+    	    	    	    					sp = '<p><b>Measurement unit: </b>' + field.measurement_unit;
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				else {
+    	    	    	    					p1.insertAdjacentHTML('beforeend','date field');
+    	    	    	    				}
+    	    	    	    				sp = '<div class="form-group">' +
+	    	    	    				    '<label for="predefinedValue"><b>Do you want to predefine this field for the doctors?</b></label>' +
+	    	    	    				    '<input type="text" class="form-control" id="predefinedValue' + field.fieldid + '" aria-describedby="predefValueHelp" placeholder="Enter predefined value for the field">' +
+	    	    	    				    '<small id="predefValueHelp" class="form-text text-muted">Enter a predefined value for the correspondent field, if you wish.</small>' +
+	    	    	    				  	'</div>';
+	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				coldiv.appendChild(fdiv);
+    	    	    	    				div.appendChild(coldiv)
+    	    	    	    			}
+    	    	    	    	    }
+    	    	    	    	}
+    	    	    	    	xmlhttp2.open("GET", "http://localhost:8080/eCRF/rest/modules/" + module.moduleid + "/sections/" + section.sectionid + "/fields", false);
+    	    	    	      	xmlhttp2.send();
+    	    	    	      	var br = document.createElement('br');
+    	    	    	      	div.appendChild(br);
+    	    	    		}
+    	    	        }
+    	    	    }  
+    	    	    xmlhttp1.open("GET", "http://localhost:8080/eCRF/rest/modules/" + module.moduleid + "/sections/", false);
+    	    	    xmlhttp1.send();
+    	    	} 
+    	    }
+    	}  
+    	xmlhttp.open("GET", "http://localhost:8080/eCRF/rest/modules/", false);
+      	xmlhttp.send();
+    }
+    
+    function saveModel() {
+    	//console.log("Saving model process started");
+    	var model = new Object();
+    	model.v_num = "1.10";
+    	var today = new Date();
+    	var dd = String(today.getDate()).padStart(2, '0');
+    	var mm = String(today.getMonth() + 1).padStart(2, '0');
+    	var yyyy = today.getFullYear();
+    	today = yyyy + '-' + mm + '-' + dd;
+    	model.date_of_creation = today;
+    	model.admin_id = 1;
+    	model.included = saveModelsFields(model.v_num);
+    		
+    	//console.log(model);
+    	createModel(model);
+    	//window.open("createForm.html", "_self");
+    };
+    	  
+    function createModel(model) {
+    	var xmlhttp = new XMLHttpRequest();
+    	xmlhttp.onreadystatechange = function () {
+    	    if(this.readyState == 4 && (this.status === 0 || (this.status >= 200 && this.status < 400))) {
+    			console.log("Post executed succesfully");
+    	    }
+    	};
+    	xmlhttp.open("POST", "http://localhost:8080/eCRF/rest/models/" + model.v_num, true);
+    	xmlhttp.setRequestHeader("Content-type", "application/json");
+    	xmlhttp.send(JSON.stringify(model));
+    };
+    	  
+    function saveModelsFields(model_v_num) {
+    	var includedFields = [];
+    	for(var j = 0; j < sects.length; j++) {
+    		for(var m = j*sects[j].length; m < sects[j].length + (j*sects[j].length); m++) {
+    			for(var k = 0; k < flds[m].length; k++) {
+    				var card = document.getElementById('field'+flds[m][k].fieldid);
+    				var predefinedInput = document.getElementById('predefinedValue'+flds[m][k].fieldid).value;
+    				var included = document.getElementById('checkbox'+flds[m][k].fieldid).checked;
+    				//var required
+    				var field = new Object();
+    				field.fieldid = flds[m][k].fieldid;
+    				field.name = flds[m][k].name;
+    				field.tip = flds[m][k].tip;
+    				field.version = flds[m][k].version;
+    				field.date_of_release = flds[m][k].date_of_release;
+    				field.sectionid = flds[m][k].sectionid;
+    				//console.log(field);
+    				//console.log(included);
+    				//console.log(predefinedInput);
+    				//console.log(model_v_num);
+    				includedFields.push({
+    					 "field" : field,
+    					 "included" : included, 
+    					 "required" : true, //change that
+    					 "predef_value" : predefinedInput,
+    					 "model_v_num" : model_v_num
+    				});
+    			}
+    		}			  
+    	}
+    	console.log(includedFields);
+    	return includedFields;
+    };
+</script>
+</body>
+</html>

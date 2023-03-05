@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>eCRF system</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+     <!-- FontAwesome glyphicon css library -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+    	.btn {
+    		border-radius:40px;
+    	}
+    
+    	.tab-pane {
+    		padding-top: 30px;
+    		padding-bottom: 30px;
+    	}
+    	
+    	.d-flex {
+    		padding-bottom: 40px;
+    	}
+    	
+    	.nav-link {
+    		color: black;
+    	}
+    	
+    	.switch {
+  			position: relative;
+  			width: 35px;
+  			height: 18px;
+	  	}
+
+	  	.switch input { 
+  			opacity: 0;
+  			width: 0;
+  			height: 0;
+      	}
+
+	  	.slider {
+  			position: absolute;
+  			cursor: pointer;
+  			top: 0;
+  			left: 0;
+  			right: 0;
+  			bottom: 0;
+  			background-color: #ccc;
+  			-webkit-transition: .4s;
+  			transition: .4s;
+	  	}
+
+	  	.slider:before {
+  	  		position: absolute;
+  	  		content: "";
+  	  		height: 10px;
+  	  		width: 10px;
+  	  		left: 4px;
+  	  		bottom: 4px;
+  	  		background-color: white;
+  	  		-webkit-transition: .4s;
+  	  		transition: .4s;
+	  	}
+
+	  	input:checked + .slider {
+  	  		background-color: #2196F3;
+	  	}
+
+	  	input:focus + .slider {
+  	  		box-shadow: 0 0 1px #2196F3;
+	  	}
+
+	  	input:checked + .slider:before {
+  	  		-webkit-transform: translateX(17px);
+      		-ms-transform: translateX(17px);
+  	  		transform: translateX(17px);
+	  	}
+
+	  	/* Rounded sliders */
+	  	.slider.round {
+  	  		border-radius: 14px;
+	  	}
+
+	  	.slider.round:before {
+  	 		border-radius: 50%;
+	  	}
+    </style>
+</head>
+<body>
+	<div class="jumbotron text-center">
+    	<h1>Online eCRF form filling</h1>
+    	<p>Fill in your eCRF, based on the latest eCRF model that the admin created.</p>
+    </div>
+    
+	<div class="container p-4">
+		<div class="form-group">
+    		<label for="pid"><b>Patient Identifier</b></label>
+    		<input style="width: 25%;" type="text" class="form-control" id="pid" placeholder="COUNTRYCODE_BSN">
+  		</div>
+ 			<ul class="nav nav-tabs justify-content-end" id="tab-next-prev" role="tablist">
+    		<li class="nav-item">
+      			<a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true"><b>Module 1</b></a>
+    		</li>
+    		<li class="nav-item">
+      			<a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false"><b>Module 2</b></a>
+    		</li>
+    		<li class="nav-item">
+      			<a class="nav-link" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="false"><b>Module 3</b></a>
+    		</li>
+  		</ul>
+  
+  		<div class="tab-content" id="tab-next-prev-content">
+    		<div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+      			<!-- <p>Content tab 1.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-next">Next</a>
+    		</div>
+    		<div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+      			<!-- <p>Content tab 2.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-prev">Previous</a>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-next">Next</a>
+    		</div>
+    		<div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+      			<!-- <p>Content tab 3.</p> -->
+      			<div></div>
+      			<a href="#" role="button" class="btn btn-outline-secondary btn-tab-prev">Previous</a>
+    		</div>
+  		</div>
+	</div>
+	<div class="container d-flex justify-content-end">
+	<button type="button" class="btn btn-outline-secondary" id="get save" onclick="getModel()">
+  		<span class="fa fa-download"></span> Get latest model
+  	</button>
+  	<button type="button" class="btn btn-outline-secondary" id="log out" onclick="location.href='index.html'">
+  		<span class="fa fa-sign-out"></span> Log out
+  	</button>
+  	</div>
+  	
+  	<script>
+  	var incl = [];
+  	var model;
+  	
+  	function getModel() {
+  		var button = document.getElementById('get save');
+    	button.innerHTML = "Save form";
+    	button.setAttribute("onclick", "saveForm()");
+    	var navlinks = document.getElementsByClassName('nav-link'); 
+    	var navtabs = document.getElementsByClassName('tab-pane');
+    	
+    	var xmlhttp2 = new XMLHttpRequest();
+    	xmlhttp2.onreadystatechange = function () {
+    		if(this.readyState == 4  && this.status == 200) {
+    			var response = this.responseText;
+    			model = JSON.parse(response);
+    	        var includedFields = model.included;
+    	        console.log(includedFields);
+    	        
+    	        var xmlhttp = new XMLHttpRequest();
+    	    	xmlhttp.onreadystatechange = function () {
+    	    		if(this.readyState == 4  && this.status == 200) {
+    	    			var response = this.responseText;
+    	    			var mods = JSON.parse(response);
+
+    	    	    	for (var i = 0; i < mods.length; i++) {
+    	    	            var module = mods[i];
+    	    	    		navtabs[i].setAttribute("id", "tab" + module.moduleid);
+    	    	    		navlinks[i].setAttribute("href", "#tab" + module.moduleid);
+    	    	    		navlinks[i].setAttribute("aria-controls", "tab" + module.moduleid);
+    	    	    		var div = navtabs[i].getElementsByTagName("div")[0];
+    	    	    		var h4 = document.createElement('h4');
+    	    	    		h4.setAttribute("class", "justify-content-end");
+    	    	    		h4.innerHTML = module.name;
+    	    	    		div.appendChild(h4);
+    	    	    		div.appendChild(document.createElement('br'));
+    	    	    		
+    	    	    	    var xmlhttp1 = new XMLHttpRequest();
+    	    	    	    xmlhttp1.onreadystatechange = function () {
+    	    	    	    	if(this.readyState == 4  && this.status == 200) {
+    	    	    	    		var response1 = this.responseText;
+    	    	    	    		var sections = JSON.parse(response1);
+    	    	    	    		for (var j = 0; j < sections.length; j++) {
+    	    	    	    			var section = sections[j];
+    	    	    	    			
+    	    	    	    			var secbut = document.createElement('button');
+    	    	    	    			secbut.setAttribute("class", "btn btn-outline-secondary btn-lg btn-block text-left");
+    	    	    	    			secbut.setAttribute("type", "button");
+    	    	    	    			secbut.setAttribute("data-toggle", "collapse");
+    	    	    	    			secbut.setAttribute("data-target", "#collapse" + section.sectionid);
+    	    	    	    			secbut.setAttribute("aria-expanded", "false");
+    	    	    	    			secbut.setAttribute("aria-controls", "collapse" + section.sectionid);
+    	    	    	    			secbut.innerHTML = "<b>Section: " + section.name + "</b>"; 
+    	    	    	    			div.appendChild(secbut);
+    	    	    	    			
+    	    	    	    			for(var k = 0; k < includedFields.length; k++) {
+    	    	    	    				var field = includedFields[k];
+    	    	    	    				
+    	    	    	    				if(field.field.sectionid === section.sectionid && field.included == true) {
+    	    	    	    					incl.push(field);
+    	    	    	    				var coldiv = document.createElement('div');
+    	    	    	    				coldiv.setAttribute("class", "collapse");
+    	    	    	    				coldiv.setAttribute("id", "collapse" + section.sectionid);
+    	    	    	    				var fdiv = document.createElement('div');
+    	    	    	    				fdiv.setAttribute("class", "card card-body");
+    	    	    	    				fdiv.setAttribute("id", "field" + field.fieldid);
+    	    	    	    				
+    	    	    	    				var p = document.createElement('p');
+    	    	    	    				p.innerHTML = "<b>Field Name:</b> " + field.field.name + ", <b>Type of field: </b> ";
+    	    	    	    				fdiv.appendChild(p);
+    	    	    	    				
+    	    	    	    				var sp;
+    	    	    	    				if(Object.keys(field.field).includes("num_of_possible_values")) {
+    	    	    	    					p.insertAdjacentHTML('beforeend','checkbox field');
+    	    	    	    					
+    	    	    	    					var npv = field.field.num_of_possible_values;
+    	    	    	    					var possible_values = field.field.possible_values.split(', ');
+    	    	    	    					for(var m=0; m<npv; m++) {
+    	    	    	    						var ndiv = document.createElement('div');
+    	    	                    				ndiv.setAttribute("class", "form-check form-check-inline");
+    	    	                    				ndiv.setAttribute("id", field.field.fieldid + m);
+    	    	                    				var label = document.createElement('label');
+    	    	                    				label.setAttribute("class", "form-check-label");
+    	    	                    				var input = document.createElement('input');
+    	    	                    				input.setAttribute("class", "form-check-input");
+    	    	                    				input.setAttribute("type", "radio");
+    	    	                    				input.setAttribute("name", "optradio" + k);
+    	    	                    				console.log(ndiv);
+    	    	                    				ndiv.appendChild(input);
+    	    	                    				label.innerHTML = possible_values[m];
+    	    	                    				ndiv.appendChild(label);
+    	    	    	    						fdiv.appendChild(ndiv);
+    	    	    	    					}
+    	    	    	    				}
+    	    	    	    				else if(Object.keys(field.field).includes("field_length") && Object.keys(field.field).includes("measurement_unit")) {
+    	    	    	    					p.insertAdjacentHTML('beforeend','controlled vocabulary field');
+    	    	    	    					var length = field.field.field_length;
+    	    	    	    					var fieldid = field.field.fieldid;
+    	    	    	    					var measurement_unit = field.field.measurement_unit;
+    	    	    	    					sp = '<form class="form-inline"><div class="form-group">' +
+    	    	    	    					'<div>' +
+    	    	    	    				    '<input type="text" class="form-control" id="answer' + fieldid + '" aria-describedby="answerHelp" placeholder="Enter your answer" maxLength="' + length + '">' +
+    	    	    	    				    '</div></form>' +
+    	    	    	    				    '<label style="padding-left:10px;" for="answer'+ fieldid +'"form-label"> ' + measurement_unit + '</label>' +
+    	    	    	    				    '</div>' +
+    	    	    	    				    '<small id="answerHelp" class="form-text text-muted">The maximum number of characters for this field is ' + length +'.</small>';
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				else if(Object.keys(field.field).includes("measurement_unit")) {
+    	    	    	    					p.insertAdjacentHTML('beforeend','free text field');
+    	    	    	    					var fieldid = field.field.fieldid;
+    	    	    	    					var measurement_unit = field.field.measurement_unit;
+    	    	    	    					sp = '<form class="form-inline"><div class="form-group">' +
+    	    	    	    					'<div>' +
+    	    	    	    				    '<input type="text" class="form-control" id="answer' + fieldid + '" aria-describedby="answerHelp" placeholder="Enter your answer">' +
+    	    	    	    				    '</div></form>' +
+    	    	    	    				    '<label style="padding-left:10px;" for="answer'+ fieldid +'" class="form-label"> ' + measurement_unit + '</label>' +
+    	    	    	    				    '</div>';
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				else {
+    	    	    	    					p.insertAdjacentHTML('beforeend','date field');
+    	    	    	    					sp = '<div class="form-group row">' +
+    	    	    	    					  '<label for="answer' + field.field.fieldid + '" class="col-2 col-form-label">Date</label>' +
+    	    	    	    					  '<div class="col-10">' +
+    	    	    	    					    '<input class="form-control" type="date" value="" id="answer' + field.field.fieldid + '">' +
+    	    	    	    					  '</div>' +
+    	    	    	    					'</div>';
+    	    	    	    					fdiv.insertAdjacentHTML('beforeend',sp);
+    	    	    	    				}
+    	    	    	    				coldiv.appendChild(fdiv);
+    	    	    	    				div.appendChild(coldiv); }
+    	    	    	    			}
+    	    	    	    			var br = document.createElement('br');
+    	    	    	    	      	div.appendChild(br);
+    	    	    	    		}
+    	    	    	        }
+    	    	    	    }  
+    	    	    	    xmlhttp1.open("GET", "http://localhost:8080/eCRF/rest/modules/" + module.moduleid + "/sections/", false);
+    	    	    	    xmlhttp1.send();
+    	    	    	} 
+    	    	    }
+    	    	}  
+    	    	xmlhttp.open("GET", "http://localhost:8080/eCRF/rest/modules/", false);
+    	      	xmlhttp.send();
+    	  	}
+    	}  
+    	xmlhttp2.open("GET", "http://localhost:8080/eCRF/rest/models/latest", false);
+      	xmlhttp2.send();
+  	};
+  	
+  	function saveForm() {
+    	console.log("Saving form process started");
+    	console.log(model);
+    	var form = new Object();
+    	form.form_id = model.v_num + ".1";
+    	form.model_v_num = model.v_num;
+    	form.doctor_id = 2;
+    	form.patient_id = 3;
+    	form.answers = saveFormsAnswers(form.form_id);
+    		
+    	console.log(form);
+    	createForm(form);
+    };
+    	  
+    function createForm(form) {
+    	var xmlhttp = new XMLHttpRequest();
+    	xmlhttp.onreadystatechange = function () {
+    	    if(this.readyState == 4 && (this.status === 0 || (this.status >= 200 && this.status < 400))) {
+    			console.log("Post executed succesfully");
+    	    }
+    	};
+    	xmlhttp.open("POST", "http://localhost:8080/eCRF/rest/forms/" + form.form_id, true);
+    	xmlhttp.setRequestHeader("Content-type", "application/json");
+    	xmlhttp.send(JSON.stringify(form));
+    };
+    	  
+    function saveFormsAnswers(form_id) {
+    	var includedFields = incl;
+    	console.log(includedFields);
+    	var answeredFields = [];
+    	for(var i = 0; i < includedFields.length; i++) {
+    		console.log(includedFields[i].field.fieldid + " " + includedFields[i].included);
+    		
+    		var field = new Object();
+			field.fieldid = includedFields[i].field.fieldid;
+			field.name = includedFields[i].field.name;
+			field.tip = includedFields[i].field.tip;
+			field.version = includedFields[i].field.version;
+			field.date_of_release = includedFields[i].field.date_of_release;
+			field.sectionid = includedFields[i].field.sectionid;
+			
+			var today = new Date();
+		    var dd = String(today.getDate()).padStart(2, '0');
+		    var mm = String(today.getMonth() + 1).padStart(2, '0');
+		    var yyyy = today.getFullYear();
+		    today = yyyy + '-' + mm + '-' + dd;
+				
+    		if(Object.keys(includedFields[i].field).includes("num_of_possible_values")) {
+    				
+    			var npv = includedFields[i].field.num_of_possible_values;
+    			for(var n=0; n<npv; n++) {
+    				var radiodiv = document.getElementById(includedFields[i].field.fieldid + n);
+    				var radio = radiodiv.getElementsByTagName("input")[0];
+    				if(radio.checked) {
+    					answeredFields.push({
+    	    				 "field" : field,
+    	    				 "form_id" : form_id, 
+    	    				 "answer_text" : radiodiv.getElementsByTagName("label")[0].innerHTML,
+    	    				 "date" : today
+    	    			});
+    					break;
+    				}
+    			}
+    				
+    		}
+    		else {
+    			
+    			var answer = document.getElementById("answer" + includedFields[i].field.fieldid);
+    			console.log(answer.value);
+    			answeredFields.push({
+   					"field" : field,
+   					"form_id" : form_id, 
+   					"answer_text" : answer.value,
+   					"date" : today
+   				});
+    			
+    		}
+    	}
+    	console.log(answeredFields);
+    	return answeredFields;
+    };
+  	</script>
+</body>
+</html>

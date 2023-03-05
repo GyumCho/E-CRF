@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	html {
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Add styles to the form container */
+.container {
+  position: center;
+  right: center;
+  margin: 20vh;
+  max-width: 300px;
+  padding: 20px;
+  background-color: #4682B4;
+}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+      .form-conatiner{border:1px solid #fff; padding: 20px; 
+-webkit-box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);
+-moz-box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);
+box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);}
+</style>
+
+<meta charset="UTF-8">
+<title>eCRF system - Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+<link href = css/global.css type ="text/css" rel ="stylesheet">
+<script src="http://ajax.gooleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body style = "background: url(https://www.who.int/images/default-source/default-album/who-emblem-rgb.png?sfvrsn=39f388cd_0); background-size : 100%, 100% ;">
+<div class="container">
+	<div class ="row">
+		<div class="col-md-4 col-sm-4 col-xs-8"></div>
+  		<div class="col-md-4 col-sm-4 col-xs-8">
+</div>
+<form class = "form-conatiner">
+  <div class="form-group">
+     <label for="uname">Username:</label>
+    <input type="text" class="form-control" id="uname" placeholder="Enter username" name="uname" required>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"> Remember me
+    </label>
+  </div>
+  <div><button  type ="button" onclick = checkID() >Enter</button></div>
+</form>
+
+<div class="col-md-4 col-sm-4 col-xs-8"></div>
+	</div>
+	</div>
+</body>
+<script> 
+function checkID(){
+	var correct_id ="admin";
+	var correct_psw ="admin";
+	var correct_id2 ="doctor";
+	var correct_psw2 ="doctor";
+	let username = document.getElementById("uname");
+	let password = document.getElementById("exampleInputPassword1");
+	
+	if (correct_id === username.value
+			&& correct_psw === password.value){
+		location.href= "Admin.html"
+	}
+	else if(correct_id2 === username.value
+			&& correct_psw2 === password.value){
+		location.href= "DoctorPage.html"
+	}
+	else{
+		location.href='#';
+	}
+}
+</script>
+</html>
