@@ -12,4 +12,5 @@ Tim Eichhorn,
 Dionysios Antoniadis Leivadas)
 
 All project codes are in edc-system-for-ecrfs-master/src/main
-Lo-Fi prototype(HCI) images are in edc-system-for-ecrfs-master/design
+
+Lo-Fi prototype (HCI) images are in edc-system-for-ecrfs-master/design
